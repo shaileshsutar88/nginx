@@ -16,8 +16,8 @@ execute 'update-rc.d -f apache2 remove' do
 	action :run
 end
 
-execute 'apt-get remove apache2' do
-	action :run
+package 'apache2' do
+	action :remove
 end
 
 package 'nginx' do
@@ -29,13 +29,12 @@ cookbook_file "/var/www/html/index.php" do
 	mode  "0644"
 end
 
-cookbook_file "/etc/nginx/sites-available/default" do
-	source "default"
+template "/etc/nginx/sites-available/default" do
+	source "default.erb"
+	owner "root"
+	group "root"
 	mode  "0644"
-end
-
-service 'nginx' do
-	action :start
+	notifies :restart, "service[nginx]"
 end
 
 package 'php5-fpm' do
